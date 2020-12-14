@@ -13,6 +13,7 @@ using RentalKendaraan_018.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RentalKendaraan_018.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace RentalKendaraan_018
 {
@@ -42,7 +43,20 @@ namespace RentalKendaraan_018
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultUI()
                 .AddEntityFrameworkStores<Rental_KendaraanContext>().AddDefaultTokenProviders();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAuthorization(options => {
+                options.AddPolicy("readonlypolicy", 
+                    builder => builder.RequireRole("Admin", "Manager", "Kasir"));
+                options.AddPolicy("writepolicy", 
+                    builder => builder.RequireRole("Admin", "Kasir"));
+                options.AddPolicy("editpolicy", 
+                    builder => builder.RequireRole("Admin", "Kasir"));
+                options.AddPolicy("deletepolicy", 
+                    builder => builder.RequireRole("Admin", "Kasir"));
+            });
+            services.AddScoped<Peminjaman>();
+            services.AddScoped<Pengembalian>();
+
+        services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
